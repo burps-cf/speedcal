@@ -46,9 +46,18 @@
 #define IN3 9
 #define IN4 11
 
-void forward(){ 
-  digitalWrite(ENA,HIGH); //enable L298n A channel
-  digitalWrite(ENB,HIGH); //enable L298n B channel
+const int defaultSpeed = 150;
+
+void setSpeed (int speed) {
+  speed = constrain(speed, 0, 255);
+  analogWrite(ENB,speed);
+  analogWrite(ENA,speed);
+} // setSpeed
+
+void forward(int speed){
+  //digitalWrite(ENA,HIGH); //enable L298n A channel
+  //digitalWrite(ENB,HIGH); //enable L298n B channel
+  setSpeed(speed);
   digitalWrite(IN1,HIGH); //set IN1 hight level
   digitalWrite(IN2,LOW);  //set IN2 low level
   digitalWrite(IN3,LOW);  //set IN3 low level
@@ -56,9 +65,10 @@ void forward(){
   Serial.println("Forward");//send message to serial monitor
 }
 
-void back(){
-  digitalWrite(ENA,HIGH);
-  digitalWrite(ENB,HIGH);
+void back(int speed){
+  //digitalWrite(ENA,HIGH);
+  //digitalWrite(ENB,HIGH);
+  setSpeed(speed);
   digitalWrite(IN1,LOW);
   digitalWrite(IN2,HIGH);
   digitalWrite(IN3,HIGH);
@@ -66,9 +76,10 @@ void back(){
   Serial.println("Back");
 }
 
-void left(){
-  digitalWrite(ENA,HIGH);
-  digitalWrite(ENB,HIGH);
+void left(int speed){
+  //digitalWrite(ENA,HIGH);
+  //digitalWrite(ENB,HIGH);
+  setSpeed(speed);
   digitalWrite(IN1,LOW);
   digitalWrite(IN2,HIGH);
   digitalWrite(IN3,LOW);
@@ -76,14 +87,19 @@ void left(){
   Serial.println("Left");
 }
 
-void right(){
-  digitalWrite(ENA,HIGH);
-  digitalWrite(ENB,HIGH);
+void right(int speed){
+  //digitalWrite(ENA,HIGH);
+  //digitalWrite(ENB,HIGH);
+  setSpeed(speed);
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2,LOW);
   digitalWrite(IN3,HIGH);
   digitalWrite(IN4,LOW);
   Serial.println("Right");
+}
+
+void stop() {
+  setSpeed(0);
 }
 
 //before execute loop() function, 
@@ -100,12 +116,12 @@ void setup() {
 
 //Repeat execution
 void loop() {
-  forward();  //go forward
+  forward(defaultSpeed);  //go forward
   delay(1000);//delay 1000 ms
-  back();     //go back
+  back(defaultSpeed);     //go back
   delay(1000);
-  left();     //turning left
+  left(defaultSpeed);     //turning left
   delay(1000);
-  right();    //turning right
+  right(defaultSpeed);    //turning right
   delay(1000);
 }
