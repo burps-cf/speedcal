@@ -122,6 +122,33 @@ int testDistance() {
 } // testDistance
 
 
+// measure speed moving forward closer to an obstacle
+void testSpeed(int motorPWM) {
+  unsigned long t0, t1; // time stamps
+  int d0, d1; // distances
+  float speed;
+
+  Serial.print(motorPWN);
+  Serial.print(" => ");
+  myservo.write(90);  // point ultrasonic sensor forward
+  delay(500);
+
+  d0 = testDistance();
+  t0 = millis();
+  while (testDistance() > stopDistance) {
+    forward (motorPWM);
+  }
+  stop();
+  t1 = millis();
+  d1 = testDistance();
+
+  speed = (d1-d0)*1000.0/(t1-t0);
+
+  // speed [cm/s]
+  Serial.println(speed, 2);
+} // testSpeed
+
+
 void setup() {
   Serial.begin(9600);
 
@@ -143,25 +170,7 @@ void setup() {
 //Repeat execution
 void loop() {
 
-  unsigned long t0, t1; // time stamps
-  int d0, d1; // distances
-  float speed;
+  testSpeed (defaultSpeed);
 
-  myservo.write(90);  // point ultrasonic sensor forward
-  delay(500);
-
-  d0 = testDistance();
-  t0 = millis();
-  while (testDistance() > stopDistance) {
-    forward (defaultSpeed);
-  }
-  stop();
-  t1 = millis();
-  d1 = testDistance();
-
-  speed = (d1-d0)*1000.0/(t1-t0);
-
-  // speed [cm/s]
-  Serial.println(speed, 2);
 } // loop
 
