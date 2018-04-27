@@ -55,6 +55,8 @@ const int Trig = A5;
 
 const int defaultSpeed = 150;
 
+const int stopDistance = 30;
+
 void setSpeed (int speed) {
   speed = constrain(speed, 0, 255);
   analogWrite(ENB,speed);
@@ -140,12 +142,26 @@ void setup() {
 
 //Repeat execution
 void loop() {
-  forward(defaultSpeed);  //go forward
-  delay(1000);//delay 1000 ms
-  back(defaultSpeed);     //go back
-  delay(1000);
-  left(defaultSpeed);     //turning left
-  delay(1000);
-  right(defaultSpeed);    //turning right
-  delay(1000);
-}
+
+  unsigned long t0, t1; // time stamps
+  int d0, d1; // distances
+  float speed;
+
+  myservo.write(90);  // point ultrasonic sensor forward
+  delay(500);
+
+  d0 = testDistance();
+  t0 = millis();
+  while (testDistance() > stopDistance) {
+    forward (defaultSpeed);
+  }
+  stop();
+  t1 = millis();
+  d1 = testDistance();
+
+  speed = (d1-d0)*1000.0/(t1-t0);
+
+  // speed [cm/s]
+  Serial.println(speed, 2);
+} // loop
+
