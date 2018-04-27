@@ -128,7 +128,7 @@ void testSpeed(int motorPWM) {
   int d0, d1; // distances
   float speed;
 
-  Serial.print(motorPWN);
+  Serial.print(motorPWM);
   Serial.print(" => ");
   myservo.write(90);  // point ultrasonic sensor forward
   delay(500);
@@ -159,6 +159,7 @@ void setup() {
   pinMode(IN4,OUTPUT);
   pinMode(ENA,OUTPUT);
   pinMode(ENB,OUTPUT);
+  stop();
 
   // init servo and pins for ultrasonic
   myservo.attach(3);
@@ -167,10 +168,22 @@ void setup() {
 } // setup
 
 
+const int nSamples = 4;
+
 //Repeat execution
 void loop() {
 
-  testSpeed (defaultSpeed);
+  int sample, pwm;
+  char getStr;
+
+  for (sample = 1; sample <= nSamples; sample++){
+    // wait for the user
+    getStr = Serial.read();
+
+    // spread samples evenly over valid range of PWM
+    pwm = map (sample,0,nSamples,0,255);
+    testSpeed(pwm);
+  }
 
 } // loop
 
