@@ -27,6 +27,13 @@
 
 // www.elegoo.com
 
+// ultrasonic distance sensor sits on top of servo
+#include <Servo.h>  //servo library
+Servo myservo;      // create servo object to control servo
+
+const int Echo = A4;
+const int Trig = A5;
+
 //    The direction of the car's movement
 //  ENA   ENB   IN1   IN2   IN3   IN4   Description  
 //  HIGH  HIGH  HIGH  LOW   LOW   HIGH  Car is runing forward
@@ -54,65 +61,82 @@ void setSpeed (int speed) {
   analogWrite(ENA,speed);
 } // setSpeed
 
+
 void forward(int speed){
-  //digitalWrite(ENA,HIGH); //enable L298n A channel
-  //digitalWrite(ENB,HIGH); //enable L298n B channel
   setSpeed(speed);
-  digitalWrite(IN1,HIGH); //set IN1 hight level
-  digitalWrite(IN2,LOW);  //set IN2 low level
-  digitalWrite(IN3,LOW);  //set IN3 low level
-  digitalWrite(IN4,HIGH); //set IN4 hight level
-  Serial.println("Forward");//send message to serial monitor
-}
+  digitalWrite(IN1,HIGH);
+  digitalWrite(IN2,LOW);
+  digitalWrite(IN3,LOW);
+  digitalWrite(IN4,HIGH);
+  Serial.println("Forward");
+} // forward
+
 
 void back(int speed){
-  //digitalWrite(ENA,HIGH);
-  //digitalWrite(ENB,HIGH);
   setSpeed(speed);
   digitalWrite(IN1,LOW);
   digitalWrite(IN2,HIGH);
   digitalWrite(IN3,HIGH);
   digitalWrite(IN4,LOW);
   Serial.println("Back");
-}
+} // back
+
 
 void left(int speed){
-  //digitalWrite(ENA,HIGH);
-  //digitalWrite(ENB,HIGH);
   setSpeed(speed);
   digitalWrite(IN1,LOW);
   digitalWrite(IN2,HIGH);
   digitalWrite(IN3,LOW);
-  digitalWrite(IN4,HIGH); 
+  digitalWrite(IN4,HIGH);
   Serial.println("Left");
-}
+} // left
+
 
 void right(int speed){
-  //digitalWrite(ENA,HIGH);
-  //digitalWrite(ENB,HIGH);
   setSpeed(speed);
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2,LOW);
   digitalWrite(IN3,HIGH);
   digitalWrite(IN4,LOW);
   Serial.println("Right");
-}
+} // right
+
 
 void stop() {
   setSpeed(0);
-}
+} // stop
 
-//before execute loop() function, 
-//setup() function will execute first and only execute once
+
+// Ultrasonic distance measurement
+int testDistance() {
+  digitalWrite(Trig, LOW);
+  delayMicroseconds(2);
+  digitalWrite(Trig, HIGH);
+  delayMicroseconds(20);
+  digitalWrite(Trig, LOW);
+  float Fdistance = pulseIn(Echo, HIGH);
+  Fdistance= Fdistance / 58;
+  return (int)Fdistance;
+} // testDistance
+
+
 void setup() {
-  Serial.begin(9600);//open serial and set the baudrate
-  pinMode(IN1,OUTPUT);//before useing io pin, pin mode must be set first 
+  Serial.begin(9600);
+
+  // init pins for motor control
+  pinMode(IN1,OUTPUT);
   pinMode(IN2,OUTPUT);
   pinMode(IN3,OUTPUT);
   pinMode(IN4,OUTPUT);
   pinMode(ENA,OUTPUT);
   pinMode(ENB,OUTPUT);
-}
+
+  // init servo and pins for ultrasonic
+  myservo.attach(3);
+  pinMode(Echo, INPUT);
+  pinMode(Trig, OUTPUT);
+} // setup
+
 
 //Repeat execution
 void loop() {
