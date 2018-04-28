@@ -54,7 +54,7 @@ const int Trig = A5;
 #define IN4 11
 
 const int defaultSpeed = 150;
-
+const int cutOff = 92; // min PWM value to cause car to move
 const int stopDistance = 30;
 
 void setSpeed (int speed) {
@@ -66,11 +66,13 @@ void setSpeed (int speed) {
 
 void forward(int speed){
   setSpeed(speed);
+  analogWrite(ENB,speed);
+  analogWrite(ENA,speed);
   digitalWrite(IN1,HIGH);
   digitalWrite(IN2,LOW);
   digitalWrite(IN3,LOW);
   digitalWrite(IN4,HIGH);
-  Serial.println("Forward");
+  //Serial.print("Forward ");
 } // forward
 
 
@@ -135,14 +137,33 @@ void testSpeed(int motorPWM) {
 
   d0 = testDistance();
   t0 = millis();
+  forward (motorPWM);
   while (testDistance() > stopDistance) {
-    forward (motorPWM);
   }
   stop();
   t1 = millis();
   d1 = testDistance();
+  delay(100);
 
-  speed = (d1-d0)*1000.0/(t1-t0);
+  Serial.print(motorPWM);
+  delay(100);
+  Serial.print(" => ");
+  Serial.print(d0);
+  Serial.print(" / ");
+  Serial.print(d1);
+  delay(100);
+  Serial.print(" / ");
+  Serial.print(d0-d1);
+  Serial.print(" | ");
+  Serial.print(t0);
+  delay(100);
+  Serial.print(" / ");
+  Serial.print(t1);
+  Serial.print(" / ");
+  Serial.print(t1-t0);
+  delay(100);
+  Serial.print(" / ");
+  speed = (d0-d1)*1000.0/(t1-t0);
 
   // speed [cm/s]
   Serial.println(speed, 2);
@@ -168,7 +189,7 @@ void setup() {
 } // setup
 
 
-const int nSamples = 4;
+const int nSamples = 6;
 
 //Repeat execution
 void loop() {
@@ -178,10 +199,16 @@ void loop() {
 
   for (sample = 1; sample <= nSamples; sample++){
     // wait for the user
-    getStr = Serial.read();
+    do {
+      getStr = Serial.read();
+    } while (getStr != 's');
 
     // spread samples evenly over valid range of PWM
-    pwm = map (sample,0,nSamples,0,255);
+    pwm = map (sample,1,nSamples,cutOff,254);
+    Serial.print (sample);
+    Serial.print (" ==> ");
+    Serial.println(pwm);
+    delay (100);
     testSpeed(pwm);
   }
 
