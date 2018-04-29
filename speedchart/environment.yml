@@ -1,0 +1,8 @@
+name: robot-env
+dependencies:
+- python=3.5
+- pip
+- pip:
+    - PyBluez=0.22
+    - pygatt=3.2.0
+
